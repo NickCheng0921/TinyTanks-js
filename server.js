@@ -1,4 +1,8 @@
 //https://www.npmjs.com/package/ws#simple-server
+
+//https://stackoverflow.com/questions/69694055/getting-error-while-importing-function-from-another-file-in-node-js-with-ecma
+//ecma script 6 is not supported sometimes
+  //use esm package and run with node -r esm target.js
 import { WebSocketServer } from 'ws';
 
 const wss = new WebSocketServer({ port: 8000 });
