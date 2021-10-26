@@ -11,8 +11,16 @@ console.log("Server running");
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+    console.log('received: %s', decode_utf8(message));
   });
 
   //ws.send('something');
 });
+
+function encode_utf8(s) {
+  return unescape(encodeURIComponent(s));
+}
+
+function decode_utf8(s) {
+  return decodeURIComponent(escape(s));
+}
