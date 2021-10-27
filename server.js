@@ -19,6 +19,7 @@ wss.on('connection', function connection(ws) {
     let id = decode_arr[0];
     let type = decode_arr[1];
     let content = decode_arr[2];
+    console.log("id: ", id, " type:", type, " content:", content);
 
     //client is sending us a message
     if(content == "01"){
