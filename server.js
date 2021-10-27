@@ -7,7 +7,6 @@ import { WebSocketServer } from 'ws';
 
 const wss = new WebSocketServer({ port: 8000 });
 var messages = [];
-var msgcounter;
 
 console.log("Server running");
 
@@ -28,7 +27,7 @@ wss.on('connection', function connection(ws) {
       messages.push([msgid, id, content]);
 
       let payload = msgid+"02"+id+" > "+content+'\n';
-      ws.send(encode_utf8(payload));
+      ws.send("THISISAMESSAGE");
     }
 
     //client is requesting an update
