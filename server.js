@@ -41,11 +41,11 @@ wss.on('connection', function connection(ws) {
 });
 
 function decode_msg(msg){
-  let id = msg.substr(0, 8);
-  let type = msg.substr(8, 2);
+  let id = msg.toString().substr(0, 8);
+  let type = msg.toString().substr(8, 2);
   let content = "";
   try{
-    content = msg.substr(10);
+    content = msg.toString().substr(10);
   }
   catch (error){
     console.log("Error reading a msg: ", msg);
