@@ -15,12 +15,13 @@ console.log("Server running");
 wss.on('connection', function connection(ws) {
   clients.add(ws);
   //update the client on all sent messages
-  for(let paylod in messages){
+  for(let payload in messages){
+    console.log("FOUND:", payload);
     ws.send(payload);
   }
 
   ws.on('message', function incoming(message) {
-    console.log('received: %s', decode_utf8(message));
+    //console.log('received: %s', decode_utf8(message));
     let decode_arr = decode_msg(message);
     let id = decode_arr[0];
     let type = decode_arr[1];
