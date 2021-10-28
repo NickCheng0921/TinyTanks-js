@@ -15,8 +15,8 @@ console.log("Server running");
 wss.on('connection', function connection(ws) {
   clients.add(ws);
   //update the client on all sent messages
-  for(let payload in messages){
-    console.log("FOUND:", payload);
+  for(let payload of messages){
+    //console.log("FOUND:", payload);
     ws.send(payload);
   }
 
@@ -44,12 +44,6 @@ wss.on('connection', function connection(ws) {
         client.send(payload);
       }
     }
-
-    //client is requesting an update
-    if(content == "03"){
-      ;
-    }
-
   });
 
   ws.on('close', function() {
