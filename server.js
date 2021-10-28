@@ -5,14 +5,20 @@
   //use esm package and run with node -r esm target.js
 import { WebSocketServer } from 'ws';
 
+const max_msg = 40;
 const wss = new WebSocketServer({ port: 8000 });
 var messages = [];
-
 const clients = new Set();
+
 console.log("Server running");
 
 wss.on('connection', function connection(ws) {
-  let mymessages = [];
+  clients.add(ws);
+  //update the client on all sent messages
+  for(let paylod in messages){
+    ws.send(payload);
+  }
+
   ws.on('message', function incoming(message) {
     console.log('received: %s', decode_utf8(message));
     let decode_arr = decode_msg(message);
@@ -22,14 +28,20 @@ wss.on('connection', function connection(ws) {
     console.log("id: ", id, " type:", type, " content:", content);
 
     //client is sending us a message
-    if(content == "01"){
-      //makes a random string of alphanumeric values
+    if(type == "01"){
+      //makes a random string of alphanumeric values to use as an id
       let msgid = Math.random().toString(16).substr(2, 8);
-      messages.push([msgid, id, content]);
+      if(messages.length > max_msg){
+        messages = list.splice(0, max_msg/2);
+      }
 
       let payload = msgid+"02"+id+" > "+content+'\n';
-      console.log("Sending a message to client");
-      ws.send("THISISAMESSAGE");
+      messages.push(payload);
+
+      //send message to all users
+      for( let client of clients ){
+        client.send(payload);
+      }
     }
 
     //client is requesting an update
@@ -39,7 +51,9 @@ wss.on('connection', function connection(ws) {
 
   });
 
-  //ws.send('something');
+  ws.on('close', function() {
+    clients.delete(ws);
+  });
 });
 
 function decode_msg(msg){
