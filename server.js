@@ -3,6 +3,8 @@
 //https://stackoverflow.com/questions/69694055/getting-error-while-importing-function-from-another-file-in-node-js-with-ecma
 //ecma script 6 is not supported sometimes
   //use esm package and run with node -r esm target.js
+
+import sqlite3 from 'sqlite3';
 import { WebSocketServer } from 'ws';
 
 const max_msg = 40;
@@ -12,6 +14,27 @@ const clients = new Set();
 
 console.log("Server running");
 
+//connect to database
+let db = new sqlite3.Database('./tinytanks.db', (err) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log('Connected to tinytanks db.');
+});
+
+//check for user
+let user_query = 'SELECT * FROM Users WHERE tag = ?';
+db.get(user_query, ['nickch'], (err, row) => {
+  if (err) {
+    throw err;
+  }
+  return row
+    ? console.log(row.tag, " FOUND")
+    : console.log(`No user found for that id`);
+
+});
+
+//handle incoming client connections
 wss.on('connection', function connection(ws) {
   clients.add(ws);
   //update the client on all sent messages
@@ -41,7 +64,7 @@ wss.on('connection', function connection(ws) {
 
       //send message to all users
       for( let client of clients ){
-        client.send(payload);
+        client.send(encode_utf8(payload));
       }
     }
   });
@@ -71,3 +94,5 @@ function encode_utf8(s) {
 function decode_utf8(s) {
   return decodeURIComponent(escape(s));
 }
+
+db.close();
