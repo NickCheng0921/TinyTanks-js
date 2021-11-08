@@ -1,0 +1,6 @@
+Client sends a message with a type that shows its trying to authenticate
+If login is valid, token is returned that secretly allows client to use chat and game features
+    - this prevents clients from modifying game files to get past login screen
+    
+Token is then put into message calls to identify a specific user 
+    - in future, hash token into call

@@ -4,35 +4,21 @@
 //ecma script 6 is not supported sometimes
   //use esm package and run with node -r esm target.js
 
-import sqlite3 from 'sqlite3';
 import { WebSocketServer } from 'ws';
+import * as helper from './helper.js';
+import * as mydb from './database.js';
 
 const max_msg = 40;
 const wss = new WebSocketServer({ port: 8000 });
 var messages = [];
 const clients = new Set();
 
-console.log("Server running");
+helper.display_logo();
 
-//connect to database
-let db = new sqlite3.Database('./tinytanks.db', (err) => {
-  if (err) {
-    return console.error(err.message);
-  }
-  console.log('Connected to tinytanks db.');
-});
+let db = mydb.connect_db('./tinytanks.db');
 
 //check for user
-let user_query = 'SELECT * FROM Users WHERE tag = ?';
-db.get(user_query, ['nickch'], (err, row) => {
-  if (err) {
-    throw err;
-  }
-  return row
-    ? console.log(row.tag, " FOUND")
-    : console.log(`No user found for that id`);
-
-});
+mydb.user_login(db, 'nickch');
 
 //handle incoming client connections
 wss.on('connection', function connection(ws) {
@@ -44,7 +30,6 @@ wss.on('connection', function connection(ws) {
   }
 
   ws.on('message', function incoming(message) {
-    //console.log('received: %s', decode_utf8(message));
     let decode_arr = decode_msg(message);
     let id = decode_arr[0];
     let type = decode_arr[1];
@@ -64,7 +49,7 @@ wss.on('connection', function connection(ws) {
 
       //send message to all users
       for( let client of clients ){
-        client.send(encode_utf8(payload));
+        client.send(helper.encode_utf8(payload));
       }
     }
   });
@@ -85,14 +70,6 @@ function decode_msg(msg){
     console.log("Error reading a msg: ", msg);
   }
   return [id, type, content];
-}
-
-function encode_utf8(s) {
-  return unescape(encodeURIComponent(s));
-}
-
-function decode_utf8(s) {
-  return decodeURIComponent(escape(s));
 }
 
 db.close();
