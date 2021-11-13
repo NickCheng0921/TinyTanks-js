@@ -14,11 +14,12 @@ export function connect_db(path){
 
 export function user_login(db, tag, pass){
     let user_query = 'SELECT * FROM Users WHERE tag = ?';
-    db.get(user_query, [tag], (err, row) => {
-    if (err) {
-        console.log(err.message);
-        return null;
-    }
-    return (row.pass == pass)
-});
+    //console.log("Try query", tag, pass);
+    return db.get(user_query, [tag], function (err, row) {
+        if (err) {
+            console.log(err.message);
+            return null;
+        }
+        return (row.pass == pass);
+    });
 }

@@ -15,13 +15,10 @@ const clients = new Set();
 
 helper.display_logo();
 
-let db = mydb.connect_db('./tinytanks.db');
-
-//check for user
-mydb.user_login(db, 'nickch');
-
 //handle incoming client connections
 wss.on('connection', function connection(ws) {
+  var db = mydb.connect_db('./tinytanks.db');
+
   clients.add(ws);
   //update the client on all sent messages
   for(let payload of messages){
@@ -30,18 +27,30 @@ wss.on('connection', function connection(ws) {
   }
 
   ws.on('message', function incoming(message) {
-    let decode_arr = decode_msg(message);
+    let decode_arr = decode_msg( helper.decode_utf8(message) );
     let id = decode_arr[0];
     let type = decode_arr[1];
     let content = decode_arr[2];
-    console.log("RECEIVED: ", message);
     console.log("id: ", id, " type:", type, " content:", content);
 
     //someone is attempting login, id is name and content will be password
     if(type == "00"){
       if(mydb.user_login(db, id.trim(), content)){
+        console.log("Login successful for", id);
+
+        let short_id = id;
+        if(id.length > 8){
+          short_id = id.substr(0, 8);
+        }
+        while(short_id.length < 8){
+          short_id += " ";
+        }
+
         let payload = "XSERVERX" + "03" + id;
         ws.send(payload);
+      }
+      else{
+        console.log("Login unsuccessful for", id);
       }
     }
 
@@ -64,6 +73,7 @@ wss.on('connection', function connection(ws) {
   });
 
   ws.on('close', function() {
+    db.close();
     clients.delete(ws);
   });
 });
@@ -71,7 +81,7 @@ wss.on('connection', function connection(ws) {
 function decode_msg(msg){
   let id = "";
   try {
-    msg.toString().substr(0, 8);
+    id = msg.toString().substr(0, 8).trim();
   }
   catch(error){
 
@@ -79,7 +89,7 @@ function decode_msg(msg){
 
   let type = "";
   try {
-    msg.toString().substr(8, 2);
+    type = msg.toString().substr(8, 2);
   }
   catch(error){
 
@@ -94,5 +104,3 @@ function decode_msg(msg){
   }
   return [id, type, content];
 }
-
-db.close();
