@@ -12,18 +12,13 @@ export function connect_db(path){
     });      
 }
 
-/*
- * Check if a user exists, if so, generate a token for them
- */
-export function user_login(db, uid){
+export function user_login(db, tag, pass){
     let user_query = 'SELECT * FROM Users WHERE tag = ?';
-    db.get(user_query, [uid], (err, row) => {
+    db.get(user_query, [tag], (err, row) => {
     if (err) {
         console.log(err.message);
         return null;
     }
-    return row
-        ? console.log(row.tag, " FOUND")
-        : console.log(`No user found for that id`);
+    return (row.pass == pass)
 });
 }

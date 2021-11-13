@@ -36,6 +36,14 @@ wss.on('connection', function connection(ws) {
     let content = decode_arr[2];
     console.log("id: ", id, " type:", type, " content:", content);
 
+    //someone is attempting login, id is name and content will be password
+    if(type == "00"){
+      if(mydb.user_login(db, id, content)){
+        let payload = "XSERVERX" + "03" + id;
+        ws.send(payload);
+      }
+    }
+
     //client is sending us a message
     if(type == "01"){
       //makes a random string of alphanumeric values to use as an id
@@ -60,8 +68,22 @@ wss.on('connection', function connection(ws) {
 });
 
 function decode_msg(msg){
-  let id = msg.toString().substr(0, 8);
-  let type = msg.toString().substr(8, 2);
+  let id = "";
+  try {
+    msg.toString().substr(0, 8);
+  }
+  catch(error){
+
+  }
+
+  let type = "";
+  try {
+    msg.toString().substr(8, 2);
+  }
+  catch(error){
+
+  }
+
   let content = "";
   try{
     content = msg.toString().substr(10);
