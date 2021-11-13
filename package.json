@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "esm": "^3.2.25",
     "http": "^0.0.1-security",
     "sqlite3": "^4.2.0",
     "ws": "^8.2.3"

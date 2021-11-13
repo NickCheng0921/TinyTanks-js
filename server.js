@@ -34,11 +34,12 @@ wss.on('connection', function connection(ws) {
     let id = decode_arr[0];
     let type = decode_arr[1];
     let content = decode_arr[2];
+    console.log("RECEIVED: ", message);
     console.log("id: ", id, " type:", type, " content:", content);
 
     //someone is attempting login, id is name and content will be password
     if(type == "00"){
-      if(mydb.user_login(db, id, content)){
+      if(mydb.user_login(db, id.trim(), content)){
         let payload = "XSERVERX" + "03" + id;
         ws.send(payload);
       }
