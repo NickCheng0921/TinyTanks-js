@@ -35,23 +35,7 @@ wss.on('connection', function connection(ws) {
 
     //someone is attempting login, id is name and content will be password
     if(type == "00"){
-      if(mydb.user_login(db, id.trim(), content)){
-        console.log("Login successful for", id);
-
-        let short_id = id;
-        if(id.length > 8){
-          short_id = id.substr(0, 8);
-        }
-        while(short_id.length < 8){
-          short_id += " ";
-        }
-
-        let payload = "XSERVERX" + "03" + id;
-        ws.send(payload);
-      }
-      else{
-        console.log("Login unsuccessful for", id);
-      }
+      mydb.user_login(db, id.trim(), content, ws);
     }
 
     //client is sending us a message
